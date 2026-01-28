@@ -25,53 +25,48 @@ def jpos(node, joint_name: str, default=0.0) -> float:
         return default
 
 def main():
-    # IMPORTANT: do NOT call rclpy.init() here.
     node = hm.HelloNode.quick_create('lab1_ros2_motion')
 
-    # Give ROS time to populate /joint_states (prevents index/name errors)
     if not wait_for_joint_states(node, timeout_s=5.0):
         print("[WARN] joint_states not ready yet; continuing anyway (jpos may use defaults).")
 
-    # ---------------- 0) Start from stow ----------------
+
     node.stow_the_robot()
     time.sleep(0.5)
 
-    # ---------------- 1) Arm full out + lift full up (same time) ----------------
-    # If your robot refuses 1.1/0.5, reduce slightly (e.g., lift=1.0, arm=0.45).
+    # Arm full out and lift
     node.move_to_pose({
         'joint_arm': 0.5,     # meters
-        'joint_lift': 1.1     # meters
+        'joint_lift': 1.1   
     }, blocking=True)
 
-    # ---------------- 2) Wrist motors one at a time ----------------
+    # Wrist motors one at a time 
     d = np.radians(30)
 
     node.move_to_pose({'joint_wrist_yaw': 0.5}, blocking=True, duration = 2.0)
     node.move_to_pose({'joint_wrist_pitch': -0.5}, blocking=True, duration = 2.0)
     node.move_to_pose({'joint_wrist_roll': 1.0}, blocking=True, duration = 2.0)
 
-    # ---------------- 3) Gripper open then close ----------------
-    # Some setups want both left/right finger joints; do both to be safe.
-    # If open/close direction seems reversed, flip signs or swap open/close values.
+    # Gripper open then close 
     open_val = 0.04
     close_val = 0.0
     node.move_to_pose({'gripper_aperture': open_val}, blocking=True, duration=1.5)
     node.move_to_pose({'gripper_aperture': close_val}, blocking=True, duration=1.5)
 
-    # ---------------- 4) Head (RealSense) pan + tilt ----------------
+    # Head (RealSense)
     node.move_to_pose({'joint_head_pan': np.radians(45),
                       'joint_head_tilt': np.radians(45)}, blocking=True,duration = 3)
 
-    # ---------------- 5) Back to stow ----------------
+    # Back to stow 
     node.stow_the_robot()
     time.sleep(0.5)
 
-    # ---------------- 6) Base: forward 0.5m, rotate 180deg, forward 0.5m ----------------
+    # move forward and rotate and move back
     node.move_to_pose({'translate_mobile_base': 0.5}, blocking=True)
     node.move_to_pose({'rotate_mobile_base': np.radians(180)}, blocking=True)
     node.move_to_pose({'translate_mobile_base': 0.5}, blocking=True)
 
-    # Optional: stow again at the very end
+    # stow again at the very end
     node.stow_the_robot()
     time.sleep(0.5)
 

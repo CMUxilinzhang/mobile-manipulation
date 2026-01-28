@@ -6,7 +6,7 @@ import stretch_body.robot
 robot = stretch_body.robot.Robot()
 robot.startup()
 
-# 1. Extend arm fully and raise lift fully at the same time
+# Extend arm lift
 robot.arm.move_to(0.5)
 robot.lift.move_to(1.1)
 robot.push_command()
@@ -14,7 +14,7 @@ robot.push_command()
 robot.arm.wait_until_at_setpoint(timeout=20.0)
 robot.lift.wait_until_at_setpoint(timeout=20.0)
 
-# 2. Move wrist motors one at a time
+# Move wrist motors one at a time
 d = np.radians(30)
 
 robot.end_of_arm.move_by('wrist_yaw', d)
@@ -29,7 +29,7 @@ robot.end_of_arm.move_by('wrist_roll', d)
 robot.push_command()
 robot.end_of_arm.wait_until_at_setpoint()
 
-# 3. Open and close the gripper
+# Open and close the gripper
 robot.end_of_arm.move_to('stretch_gripper', 50)
 robot.push_command()
 robot.end_of_arm.wait_until_at_setpoint()
@@ -40,7 +40,7 @@ robot.end_of_arm.move_to('stretch_gripper', 0)
 robot.push_command()
 robot.end_of_arm.wait_until_at_setpoint()
 
-# 4. Rotate RealSense head motors
+# Rotate RealSense head motors
 robot.head.move_by('head_pan', d)
 robot.push_command()
 robot.head.wait_until_at_setpoint()
@@ -49,7 +49,7 @@ robot.head.move_by('head_tilt', d)
 robot.push_command()
 robot.head.wait_until_at_setpoint()
 
-# 5. Return to stow position
+# Return to stow position
 
 
 robot.stow()
